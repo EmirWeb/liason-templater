@@ -21,12 +21,15 @@ public class ${inflection.camelize(schema)}ViewModel extends ViewModel{
 
     public static class Columns {
         % for field in fields:
+            %if isJavaType(field["type"]) :
         public static final ViewModelColumn ${inflection.underscore(field["key"]).upper()} = new ViewModelColumn(${inflection.camelize(schema)}ViewModel.NAME, "${field["key"]}", Type.${toSqlType(field["type"])});
+            % endif
         % endfor
         <% 
         columns = []
         for field in fields:
-            columns.append(inflection.underscore(field["key"]).upper())
+            if isJavaType(field["type"]) :
+                columns.append(inflection.underscore(field["key"]).upper())
         %>    
         public static final Column[] COLUMNS = new Column[]{${", ".join(columns)}};
     }

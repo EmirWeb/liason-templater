@@ -1,0 +1,80 @@
+{
+	"Product": [
+		{
+			"key": "id",
+			"type": "Long",
+			"id": true
+		},
+		{
+			"key": "name",
+			"type": "String"
+		},
+		{
+			"key": "image_thumb_url",
+			"type": "String"
+		},
+		{
+			"key": "image_url",
+			"type": "String"
+		},
+		{
+			"key": "description",
+			"type": "String"
+		},
+		{
+			"key": "tasting_note",
+			"type": "String"
+		}
+	],
+	"ProductItems": [
+		{
+			"key": "_id",
+			"type": "Long",
+			"id": true
+		},
+		{
+			"key": "name",
+			"type": "String"
+		},
+		{
+			"key": "image_thumb_url",
+			"type": "String"
+		}
+	],
+	"ProductItem": [
+		{
+			"key": "_id",
+			"type": "Long",
+			"id": true
+		},
+		{
+			"key": "name",
+			"type": "String"
+		},
+		{
+			"key": "image_url",
+			"type": "String"
+		},
+		{
+			"key": "description",
+			"type": "String"
+		},
+		{
+			"key": "tasting_note",
+			"type": "String"
+		}
+	],
+	"ProductsResponse": [
+		{
+			"key": "result",
+			"type": "Product",
+			"isSet": true
+		}
+	],
+	"ProductsResponse": [
+		{
+			"key": "result",
+			"type": "Product"
+		}
+	]	
+}

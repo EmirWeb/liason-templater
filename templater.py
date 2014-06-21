@@ -47,7 +47,8 @@ def makeListItemXML(templateData):
 		if isViewModel(templateData["mappings"], schema):
 			fields = templateData["schemas"][schema]
 			templateFilename = "templates/layout.xml"
-			outputFilename = "src/main/res/layout/list_item_" + inflection.underscore(schema) + ".xml"
+
+			outputFilename = "src/main/res/layout/" + toFilePrefix(templateData, schema) + "_" + inflection.underscore(schema) + ".xml"
 			modelTemplateData = templateData
 			modelTemplateData["fields"] = fields		
 			modelTemplateData["schema"] = schema
@@ -108,6 +109,25 @@ javaTypes = [
 	"Byte"
 ];
 
+viewModelTypes = [
+	"Activity",
+	"Fragment",
+	"Adapter",
+	"View"
+];
+
+filePrefixes = [
+	"activity",
+	"fragment",
+	"list_item"
+]
+
+viewModelTypeToFilePrefixMap = {
+	viewModelTypes[0]: filePrefixes[0],
+	viewModelTypes[1]: filePrefixes[1],
+	viewModelTypes[2]: filePrefixes[2]	
+};
+
 sqlTypes = [
 	"blob",
 	"integer",
@@ -130,6 +150,13 @@ javaTypeToSqlTypeMap = {
 	javaTypes[11]: sqlTypes[0],
 	javaTypes[12]: sqlTypes[0]
 };
+
+def toFilePrefix(templateData, schema):
+	viewModelConfig = templateData["mappings"]["viewmodels"][schema]
+	if "type" in viewModelConfig:	
+		if viewModelConfig["type"] in javaTypeToSqlTypeMap:
+			return javaTypeToSqlTypeMap[viewModelType]
+	return filePrefixes[2]
 
 def toSqlType(type):	
 	if type in javaTypeToSqlTypeMap:
