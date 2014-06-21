@@ -31,7 +31,7 @@ public class ${inflection.camelize(schema)}Model extends Model{
 
     public static class Columns {
         % for field in fields:
-        public static final ModelColumn ${inflection.underscore(field["key"]).upper()} = new ModelColumn(${inflection.camelize(schema)}Model.NAME, ${inflection.camelize(schema)}Json.Fields.ID, ModelColumn.Type.integer);
+        public static final ModelColumn ${inflection.underscore(field["key"]).upper()} = new ModelColumn(${inflection.camelize(schema)}Model.NAME, ${inflection.camelize(schema)}Json.Fields.ID, Type.${toSqlType(field["type"])});
         % endfor
         <% 
         columns = []

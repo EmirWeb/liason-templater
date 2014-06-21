@@ -103,8 +103,38 @@ javaTypes = [
 	"Float",
 	"String",
 	"boolean",
-	"Boolean"
+	"Boolean",
+	"byte",
+	"Byte"
 ];
+
+sqlTypes = [
+	"blob",
+	"integer",
+	"real",
+	"text"
+];
+
+javaTypeToSqlTypeMap = {
+	javaTypes[0]: sqlTypes[1],
+	javaTypes[1]: sqlTypes[1],
+	javaTypes[2]: sqlTypes[1],
+	javaTypes[3]: sqlTypes[1],
+	javaTypes[4]: sqlTypes[2],
+	javaTypes[5]: sqlTypes[2],
+	javaTypes[6]: sqlTypes[2],
+	javaTypes[7]: sqlTypes[2],
+	javaTypes[8]: sqlTypes[3],
+	javaTypes[9]: sqlTypes[3],
+	javaTypes[10]: sqlTypes[3],
+	javaTypes[11]: sqlTypes[0],
+	javaTypes[12]: sqlTypes[0]
+};
+
+def toSqlType(type):	
+	if type in javaTypeToSqlTypeMap:
+		return javaTypeToSqlTypeMap[type]
+	return sqlTypes[0]
 
 def isJavaType(type):
 	return type in javaTypes
@@ -151,8 +181,9 @@ def getTemplateData():
 	templateData["isModel"] = isModel
 	templateData["isViewModel"] = isViewModel
 	templateData["isTask"] = isTask
+	templateData["toSqlType"] = toSqlType
 	
-	return templateData
+	return templateData	
 
 deleteOutputDirectory()
 templateData = getTemplateData()
@@ -164,3 +195,4 @@ makeListItemXML(templateData)
 makeJsonModel(templateData)
 makeLiasonModel(templateData)
 makeLiasonViewModel(templateData)
+

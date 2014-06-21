@@ -21,7 +21,7 @@ public class ${inflection.camelize(schema)}ViewModel extends ViewModel{
 
     public static class Columns {
         % for field in fields:
-        public static final ViewModelColumn ${inflection.underscore(field["key"]).upper()} = new ViewModelColumn(${inflection.camelize(schema)}ViewModel.NAME, "${field["key"]}", ModelColumn.Type.integer);
+        public static final ViewModelColumn ${inflection.underscore(field["key"]).upper()} = new ViewModelColumn(${inflection.camelize(schema)}ViewModel.NAME, "${field["key"]}", Type.${toSqlType(field["type"])});
         % endfor
         <% 
         columns = []
