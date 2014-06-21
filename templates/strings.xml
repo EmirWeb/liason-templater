@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="appplication_name">${config["applicationName"]}</string>
+    <string name="authority_${inflection.underscore(config["applicationName"])}">${config["packageName"]}</string>
+</resources>

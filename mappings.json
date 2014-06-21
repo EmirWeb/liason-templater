@@ -1,0 +1,26 @@
+{
+	"models":
+	{	
+		"Product": {}
+	},
+	"viewmodels":{
+		"ProductItems": {
+			"type": "activity"
+			},
+		"ProductItem": {
+			"type": "activity"
+		}
+	},
+	"tasks" : {
+		"ProductsResponse": {
+			"notifications": [
+				"ProductItems"
+			]
+		},
+		"ProductResponse": {
+			"notifications": [
+				"ProductItem"
+			]
+		}		
+	}
+}

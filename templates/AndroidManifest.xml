@@ -1,0 +1,22 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="${config['packageName']}">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name=".${inflection.camelize(config['applicationName'])}Application"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/application_name">
+
+        <provider
+            android:name=".liason.${inflection.camelize(config['applicationName'])}Provider"
+            android:authorities="@string/authority_${inflection.underscore(config['applicationName'])}"
+            android:exported="false" />
+
+        <service
+            android:name=".liason.${inflection.camelize(config['applicationName'])}TaskService"
+            android:exported="false" />
+
+    </application>
+</manifest>
