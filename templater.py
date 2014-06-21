@@ -44,7 +44,7 @@ def makeStrings(templateData):
 
 def makeListItemXML(templateData):	
 	for schema in templateData["schemas"]:
-		if isViewmodel(templateData["mappings"], schema):
+		if isViewModel(templateData["mappings"], schema):
 			fields = templateData["schemas"][schema]
 			templateFilename = "templates/layout.xml"
 			outputFilename = "src/main/res/layout/list_item_" + inflection.underscore(schema) + ".xml"
@@ -74,6 +74,18 @@ def makeLiasonModel(templateData):
 			modelTemplateData["fields"] = fields		
 			modelTemplateData["schema"] = schema
 			makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
+
+def makeLiasonViewModel(templateData):	
+	for schema in templateData["schemas"]:
+		if isViewModel(templateData["mappings"], schema):
+			fields = templateData["schemas"][schema]
+			templateFilename = "templates/_name_ViewModel.java"
+			outputFilename = "src/main/java/" + templateData["directory"] + "/viewmodels/" + inflection.camelize(schema) + "ViewModel.java"
+			modelTemplateData = templateData
+			modelTemplateData["fields"] = fields		
+			modelTemplateData["schema"] = schema
+			makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
+
 def isId(field) :
 	hasId = "id" in field
 	if hasId :
@@ -100,7 +112,7 @@ def isJavaType(type):
 def isModel(mappings, schema):
 	return schema in mappings["models"]
 
-def isViewmodel(mappings, schema):
+def isViewModel(mappings, schema):
 	return schema in mappings["viewmodels"]
 
 def isTask(mappings, schema):
@@ -137,7 +149,7 @@ def getTemplateData():
 	templateData["isJavaType"] = isJavaType
 	templateData["isId"] = isId
 	templateData["isModel"] = isModel
-	templateData["isViewmodel"] = isViewmodel
+	templateData["isViewModel"] = isViewModel
 	templateData["isTask"] = isTask
 	
 	return templateData
@@ -151,3 +163,4 @@ makeStrings(templateData)
 makeListItemXML(templateData)
 makeJsonModel(templateData)
 makeLiasonModel(templateData)
+makeLiasonViewModel(templateData)

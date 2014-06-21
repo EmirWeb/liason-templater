@@ -1,6 +1,6 @@
 package ${config['packageName']}.models;
 
-public class ${inflection.camelize(schema)}Model {
+public class ${inflection.camelize(schema)}Model extends Model{
    
     public static final String NAME = ${inflection.camelize(schema)}Model.class.getSimpleName();
 
