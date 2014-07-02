@@ -2,7 +2,7 @@
 	"Product": [
 		{
 			"key": "id",
-			"type": "Long",
+			"type": "long",
 			"id": true
 		},
 		{
@@ -24,6 +24,10 @@
 		{
 			"key": "tasting_note",
 			"type": "String"
+		},
+		{
+			"key": "product_item",
+			"type": "ProductItem"
 		}
 	],
 	"ProductItems": [
@@ -67,8 +71,7 @@
 	"ProductsResponse": [
 		{
 			"key": "result",
-			"type": "Product",
-			"isSet": true
+			"type": "Product[]"
 		}
 	],
 	"ProductsResponse": [

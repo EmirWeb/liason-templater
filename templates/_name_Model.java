@@ -31,15 +31,12 @@ public class ${inflection.camelize(schema)}Model extends Model{
 
     public static class Columns {
         % for field in fields:
-            %if isJavaType(field["type"]) :
         public static final ModelColumn ${inflection.underscore(field["key"]).upper()} = new ModelColumn(${inflection.camelize(schema)}Model.NAME, ${inflection.camelize(schema)}Json.Fields.ID, Type.${toSqlType(field["type"])});
-            % endif
         % endfor
         <% 
         columns = []
         for field in fields:
-            if isJavaType(field["type"]) :
-                columns.append(inflection.underscore(field["key"]).upper())
+            columns.append(inflection.underscore(field["key"]).upper())
         %>    
         public static final Column[] COLUMNS = new Column[]{${", ".join(columns)}};
     }

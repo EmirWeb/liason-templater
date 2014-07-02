@@ -12,15 +12,37 @@
 		}
 	},
 	"tasks" : {
-		"ProductsResponse": {
-			"notifications": [
-				"ProductItems"
+		"Products" : {
+			"response":  {
+					"type": "ProductsResponse"
+				},
+			"model" : {
+					"type": "Product[]"
+				},
+			"viewModels": [
+				{
+					"type": "ProductItems"
+				},
+				{
+					"type": "ProductItem"	
+				}
 			]
 		},
-		"ProductResponse": {
-			"notifications": [
-				"ProductItem"
+		"Product" : {
+			"response":  {
+					"type": "ProductResponse"
+				},
+			"model" : {
+					"type": "Product"
+				},
+			"viewModels": [
+				{
+					"type": "ProductItems"
+				},
+				{
+					"type": "ProductItem"	
+				}
 			]
-		}		
+		}
 	}
 }

@@ -47,8 +47,7 @@ def makeListItemXML(templateData):
 		if isViewModel(templateData["mappings"], schema):
 			fields = templateData["schemas"][schema]
 			templateFilename = "templates/layout.xml"
-
-			outputFilename = "src/main/res/layout/" + toFilePrefix(templateData, schema) + "_" + inflection.underscore(schema) + ".xml"
+			outputFilename = "src/main/res/layout/list_item_" + inflection.underscore(schema) + ".xml"
 			modelTemplateData = templateData
 			modelTemplateData["fields"] = fields		
 			modelTemplateData["schema"] = schema
@@ -72,6 +71,7 @@ def makeLiasonModel(templateData):
 			templateFilename = "templates/_name_Model.java"
 			outputFilename = "src/main/java/" + templateData["directory"] + "/models/" + inflection.camelize(schema) + "Model.java"
 			modelTemplateData = templateData
+			
 			modelTemplateData["fields"] = fields		
 			modelTemplateData["schema"] = schema
 			makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
@@ -87,11 +87,64 @@ def makeLiasonViewModel(templateData):
 			modelTemplateData["schema"] = schema
 			makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
 
+def makeTask(templateData):		
+	tasks =  templateData["mappings"]["tasks"]
+	for task in tasks:
+		templateFilename = "templates/_name_Task.java"
+		outputFilename = "src/main/java/" + templateData["directory"] + "/tasks/" + inflection.camelize(task) + "Task.java"
+		modelTemplateData = templateData
+		taskMappings = tasks[task]
+
+		if "response" in taskMappings :
+			modelTemplateData["response"] = taskMappings["response"]
+		else :
+			modelTemplateData["response"] = {}
+
+		if "model" in taskMappings :
+			modelTemplateData["model"] = taskMappings["model"]
+		else :
+			modelTemplateData["model"] = {}
+			
+		if "viewModels" in taskMappings :
+			modelTemplateData["viewModels"] = taskMappings["viewModels"]
+		else :
+			modelTemplateData["viewModels"] = []
+					
+		makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
+
+def makeBuildGradle(templateData):			
+	templateFilename = "templates/build.gradle"
+	outputFilename = "build.gradle"
+	makeTemplateFromData(templateData, templateFilename, outputFilename)
+
+def makePomXml(templateData):			
+	templateFilename = "templates/pom.xml"
+	outputFilename = "pom.xml"
+	makeTemplateFromData(templateData, templateFilename, outputFilename)
+
 def isId(field) :
 	hasId = "id" in field
 	if hasId :
 		return field["id"]
 	return False
+
+def removeSetNotation(name):
+	return name.replace("[]", "")	
+
+def toSafeType(fieldType):
+	if fieldType in javaTypes:
+		return javaTypeToSafeJavaTypeMap[fieldType]
+	return fieldType
+
+safeJavaTypes = [
+	"Integer",
+	"Long",
+	"Double",
+	"Float",
+	"String",
+	"Boolean",
+	"Byte"
+];
 
 javaTypes = [
 	"int",
@@ -109,31 +162,28 @@ javaTypes = [
 	"Byte"
 ];
 
-viewModelTypes = [
-	"Activity",
-	"Fragment",
-	"Adapter",
-	"View"
-];
-
-filePrefixes = [
-	"activity",
-	"fragment",
-	"list_item"
-]
-
-viewModelTypeToFilePrefixMap = {
-	viewModelTypes[0]: filePrefixes[0],
-	viewModelTypes[1]: filePrefixes[1],
-	viewModelTypes[2]: filePrefixes[2]	
-};
-
 sqlTypes = [
 	"blob",
 	"integer",
 	"real",
 	"text"
 ];
+
+javaTypeToSafeJavaTypeMap = {
+	javaTypes[0]: safeJavaTypes[0],
+	javaTypes[1]: safeJavaTypes[0],
+	javaTypes[2]: safeJavaTypes[1],
+	javaTypes[3]: safeJavaTypes[1],
+	javaTypes[4]: safeJavaTypes[2],
+	javaTypes[5]: safeJavaTypes[2],
+	javaTypes[6]: safeJavaTypes[3],
+	javaTypes[7]: safeJavaTypes[3],
+	javaTypes[8]: safeJavaTypes[4],
+	javaTypes[9]: safeJavaTypes[5],
+	javaTypes[10]: safeJavaTypes[5],
+	javaTypes[11]: safeJavaTypes[6],
+	javaTypes[12]: safeJavaTypes[6]
+};
 
 javaTypeToSqlTypeMap = {
 	javaTypes[0]: sqlTypes[1],
@@ -151,12 +201,13 @@ javaTypeToSqlTypeMap = {
 	javaTypes[12]: sqlTypes[0]
 };
 
-def toFilePrefix(templateData, schema):
-	viewModelConfig = templateData["mappings"]["viewmodels"][schema]
-	if "type" in viewModelConfig:	
-		if viewModelConfig["type"] in javaTypeToSqlTypeMap:
-			return javaTypeToSqlTypeMap[viewModelType]
-	return filePrefixes[2]
+def cleanType(type):	
+	return type.replace("[]", "")
+
+def isSet(field):
+	if "isSet" in field :
+		return field["isSet"]
+	return "[]" in field["type"]
 
 def toSqlType(type):	
 	if type in javaTypeToSqlTypeMap:
@@ -166,6 +217,9 @@ def toSqlType(type):
 def isJavaType(type):
 	return type in javaTypes
 
+def isTask(mappings, schema):
+	return schema in mappings["tasks"]
+
 def isModel(mappings, schema):
 	return schema in mappings["models"]
 
@@ -174,6 +228,15 @@ def isViewModel(mappings, schema):
 
 def isTask(mappings, schema):
 	return schema in mappings["tasks"]
+
+def getId(schema):	
+	for field in schema:
+		if "id" in field
+			return field["type"]
+	return None
+
+def getField(schemas, type):
+	return schemas[type]
 
 def deleteOutputDirectory():
 	try:
@@ -209,8 +272,33 @@ def getTemplateData():
 	templateData["isViewModel"] = isViewModel
 	templateData["isTask"] = isTask
 	templateData["toSqlType"] = toSqlType
+	templateData["toSafeType"] = toSafeType
+	templateData["isSet"] = isSet
+	templateData["getId"] = getId
 	
+	cleanSchemas(templateData)
+	cleanMappings(templateData)
+
 	return templateData	
+
+def cleanSchemas(templateData):
+	schemas = templateData["schemas"]
+	for schema in schemas:
+		for field in schemas[schema]:
+			cleanField(field)
+
+def cleanField(field):
+	field["isSet"] = isSet(field)
+	field["type"] = cleanType(field["type"])			
+
+def cleanMappings(templateData):
+	mappings = templateData["mappings"]
+	tasks = mappings["tasks"]
+	for task in tasks:
+		responseField = tasks[task]["response"]
+		modelField = tasks[task]["model"]
+		cleanField(responseField)
+		cleanField(modelField)
 
 deleteOutputDirectory()
 templateData = getTemplateData()
@@ -222,4 +310,7 @@ makeListItemXML(templateData)
 makeJsonModel(templateData)
 makeLiasonModel(templateData)
 makeLiasonViewModel(templateData)
+makeBuildGradle(templateData)
+makePomXml(templateData)
+makeTask(templateData)
 

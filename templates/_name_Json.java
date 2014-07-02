@@ -6,13 +6,13 @@ public class ${inflection.camelize(schema)}Json {
 
     % for field in fields:
     @SerializedName(Fields.${inflection.underscore(field["key"]).upper()})
-    private final ${field["type"]} m${inflection.camelize(field["key"])};    
+    private final ${toSafeType(field["type"])} m${inflection.camelize(field["key"])};    
 
     % endfor
     <% 
     constructor = []
     for field in fields:
-        constructor.append("final " + field["type"] + " " + inflection.camelize(field["key"], False))
+        constructor.append("final " + toSafeType(field["type"]) + " " + inflection.camelize(field["key"], False))
     %>
     public Product(${", ".join(constructor)}) {
     % for field in fields:
@@ -21,7 +21,7 @@ public class ${inflection.camelize(schema)}Json {
     }
 
     % for field in fields:
-    public ${field["type"]} get${inflection.camelize(field["key"])}() {
+    public ${toSafeType(field["type"])} get${inflection.camelize(field["key"])}() {
         return m${inflection.camelize(field["key"])};
     }       
      
