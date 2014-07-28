@@ -87,6 +87,22 @@ def makeLiasonViewModel(templateData):
 			modelTemplateData["schema"] = schema
 			makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
 
+def makeLiasonJoinModel(templateData):	
+	for schema in templateData["schemas"]:
+		if isViewModel(templateData["mappings"], schema):
+			fields = templateData["schemas"][schema]
+			for field in fields :
+				if not isJavaType(field):
+					templateFilename = "templates/_name_JoinModel.java"
+					outputFilename = "src/main/java/" + templateData["directory"] + "/joinmodels/" + inflection.camelize(schema) + "JoinModel.java"
+					modelTemplateData = templateData		
+					modelTemplateData["join"] = field		
+					modelTemplateData["fields"] = fields		
+					modelTemplateData["schema"] = schema
+					modelTemplateData["className"] = inflection.camelize(schema) + inflection.camelize(field["key"]) + "JoinModel"
+					
+					makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
+
 def makeTask(templateData):		
 	tasks =  templateData["mappings"]["tasks"]
 	for task in tasks:
@@ -231,7 +247,7 @@ def isTask(mappings, schema):
 
 def getId(schema):	
 	for field in schema:
-		if "id" in field
+		if "id" in field:
 			return field["type"]
 	return None
 
@@ -313,4 +329,5 @@ makeLiasonViewModel(templateData)
 makeBuildGradle(templateData)
 makePomXml(templateData)
 makeTask(templateData)
+makeLiasonJoinModel(templateData)
 

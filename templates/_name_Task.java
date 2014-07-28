@@ -63,9 +63,10 @@ public class ${inflection.camelize(schema)}Task extends Task {
 
         final ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<ContentProviderOperation>();
 
-        final Uri ${inflection.camelize(model["type"], false)}ModelUri = ${inflection.camelize(config['applicationName'])}Provider.getContentUri(context, ${inflection.camelize(model["type"])}Model.Paths.PATH);
+        final Uri ${inflection.camelize(model["type"], false)}ModelUri = ${inflection.camelize(config['applicationName'])}Provider.getContentUri(context, ${inflection.camelize(model["type"])}Model.Paths.PATH);        
         % if isSet(model) :
         final ContentProviderOperation ${inflection.camelize(model["type"], false)}DeleteContentProviderOperation = ContentProviderOperation.newDelete(${inflection.camelize(model["type"], false)}ModelUri).build();
+
         contentProviderOperations.add(${inflection.camelize(model["type"], false)}DeleteContentProviderOperation );
         for (final ${inflection.camelize(model["type"])}JsonModel ${inflection.camelize(model["type"], false)}JsonModel : ${inflection.pluralize(inflection.camelize(model["type"], false) + "JsonModel")}) {
             final ContentValues ${inflection.camelize(model["type"],false)}ContentValues = ${inflection.camelize(model["type"])}Model.getContentValues(${inflection.camelize(model["type"], false)}JsonModel);
@@ -73,29 +74,30 @@ public class ${inflection.camelize(schema)}Task extends Task {
             contentProviderOperations.add(${inflection.camelize(model["type"],false)}ModelInsertContentProviderOperation);
         }
         % else :
-        final Uri ${inflection.camelize(model["type"], false)}ModelUri = ${inflection.camelize(config['applicationName'])}Provider.getContentUri(context, ${inflection.camelize(model["type"])}Model.Paths.PATH);
+        
         final ContentValues ${inflection.camelize(model["type"],false)}ContentValues = ${inflection.camelize(model["type"])}Model.getContentValues(${inflection.camelize(model["type"], false)}JsonModel);
         final ContentProviderOperation ${inflection.camelize(model["type"],false)}ModelInsertContentProviderOperation = ContentProviderOperation.newInsert(${inflection.camelize(model["type"], false)}ModelUri).withValues(${inflection.camelize(model["type"],false)}ContentValues).build();
         contentProviderOperations.add(${inflection.camelize(model["type"],false)}ModelInsertContentProviderOperation);
         % endif
 
         % for field in schemas[model["type"]]:
-        % if not isJavaType(field["type"]):
+            % if not isJavaType(field["type"]):
         final Uri ${inflection.camelize(field["type"], false)}ModelUri = ${inflection.camelize(config['applicationName'])}Provider.getContentUri(context, ${inflection.camelize(field["type"])}Model.Paths.PATH);
-            % if isSet(field) :
-            % else :            
+                % if isSet(field) :
+                
+                % else :
+
+                % endif
             % endif
-        % endif
         % endfor
 
         final ContentResolver contentResolver = context.getContentResolver();
-        final String authority = ${inflection.camelize(config['applicationName'])}Provider.getContentUri(context, ${inflection.camelize(model["type"])}Model.Paths.PATH);
-        contentResolver.applyBatch();
+        final String authority = ${inflection.camelize(config['applicationName'])}Provider.getContentAuthority(context);
+        contentResolver.applyBatch(authority);
 
         % for viewModel in viewModels :
-
         final Uri ${inflection.camelize(viewModel["type"], false)}Uri = ${inflection.camelize(config['applicationName'])}Provider.getContentUri(context, ${inflection.camelize(viewModel["type"])}ViewModel.Paths.PATH);
-        contentResolver.notify(${inflection.camelize(viewModel["type"], false)}Uri, null);
+        contentResolver.notify(${inflection.camelize(viewModel["type"], false)}Uri, null, false);
         % endfor
     }
 
