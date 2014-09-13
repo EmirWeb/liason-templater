@@ -60,7 +60,7 @@ def makeListItemXML(templateData):
 
 def makeJsonModel(templateData):	
 	for schema in templateData["schemas"]:
-		if isModel(templateData["mappings"], schema):
+		if isModel(templateData["schemas"], templateData["mappings"], schema):
 			fields = templateData["schemas"][schema]
 			templateFilename = "templates/_name_Json.java"
 			outputFilename = "src/main/java/" + templateData["directory"] + "/models/" + inflection.camelize(schema) + "Json.java"
@@ -71,7 +71,7 @@ def makeJsonModel(templateData):
 
 def makeLiasonModel(templateData):	
 	for schema in templateData["schemas"]:
-		if isModel(templateData["mappings"], schema):
+		if isModel(templateData["schemas"], templateData["mappings"], schema):
 			fields = templateData["schemas"][schema]
 			templateFilename = "templates/_name_Model.java"
 			outputFilename = "src/main/java/" + templateData["directory"] + "/models/" + inflection.camelize(schema) + "Model.java"
@@ -80,6 +80,20 @@ def makeLiasonModel(templateData):
 			modelTemplateData["fields"] = fields		
 			modelTemplateData["schema"] = schema
 			makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
+			for field in fields :
+				if not isJavaType(field["type"]):					
+					modelTemplateData = templateData		
+					modelTemplateData["join"] = field		
+					modelTemplateData["fields"] = fields		
+					modelTemplateData["schema"] = schema
+					modelTemplateData["className"] = inflection.camelize(schema) + inflection.camelize(field["key"]) + "JoinModel"
+					
+					templateFilename = "templates/_name_JoinModel.java"
+					outputFilename = "src/main/java/" + templateData["directory"] + "/joinmodels/" + modelTemplateData["className"] + ".java"
+
+					makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
+
+
 
 def makeLiasonViewModel(templateData):	
 	for schema in templateData["schemas"]:
@@ -92,22 +106,22 @@ def makeLiasonViewModel(templateData):
 			modelTemplateData["schema"] = schema
 			makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
 
-def makeLiasonJoinModel(templateData):	
-	for schema in templateData["schemas"]:
-		if not isViewModel(templateData["mappings"], schema):
-			fields = templateData["schemas"][schema]
-			for field in fields :
-				if not isJavaType(field["type"]):					
-					modelTemplateData = templateData		
-					modelTemplateData["join"] = field		
-					modelTemplateData["fields"] = fields		
-					modelTemplateData["schema"] = schema
-					modelTemplateData["className"] = inflection.camelize(schema) + inflection.camelize(field["key"]) + "JoinModel"
+# def makeLiasonJoinModel(templateData):	
+# 	for schema in templateData["schemas"]:
+# 		if isModel(templateData["mappings"], schema):
+# 			fields = templateData["schemas"][schema]
+# 			for field in fields :
+# 				if not isJavaType(field["type"]):					
+# 					modelTemplateData = templateData		
+# 					modelTemplateData["join"] = field		
+# 					modelTemplateData["fields"] = fields		
+# 					modelTemplateData["schema"] = schema
+# 					modelTemplateData["className"] = inflection.camelize(schema) + inflection.camelize(field["key"]) + "JoinModel"
 					
-					templateFilename = "templates/_name_JoinModel.java"
-					outputFilename = "src/main/java/" + templateData["directory"] + "/joinmodels/" + modelTemplateData["className"] + "JoinModel.java"
+# 					templateFilename = "templates/_name_JoinModel.java"
+# 					outputFilename = "src/main/java/" + templateData["directory"] + "/joinmodels/" + modelTemplateData["className"] + ".java"
 
-					makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
+# 					makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
 
 def makeTask(templateData):		
 	tasks =  templateData["mappings"]["tasks"]
@@ -242,8 +256,31 @@ def isJavaType(type):
 def isTask(mappings, schema):
 	return schema in mappings["tasks"]
 
-def isModel(mappings, schema):
-	return schema in mappings["models"]
+def getParents(schemas, schema):	
+	parents = []
+	for currentSchema in schemas:
+		fields = schemas[currentSchema]
+		for field in fields:
+			if field["type"] in schema:
+				parents.append(field)
+	print parents
+	return parents
+
+def isChildOfModel(schemas, mappings, schema):
+	for schema in schemas:
+		for parent in getParents(schemas, schema):
+			if parent in mappings["models"]:
+				return True
+			elif isChildOfModel(schemas, mappings, parent):
+				return True
+	return False
+
+
+def isModel(schemas, mappings, schema):
+	if schema in mappings["models"]:
+		return True
+	return isChildOfModel(schemas, mappings, schema)
+
 
 def isViewModel(mappings, schema):
 	return schema in mappings["viewmodels"]
@@ -336,5 +373,5 @@ makeLiasonViewModel(templateData)
 makeBuildGradle(templateData)
 makePomXml(templateData)
 makeTask(templateData)
-makeLiasonJoinModel(templateData)
+# makeLiasonJoinModel(templateData)
 
