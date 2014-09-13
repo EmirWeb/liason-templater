@@ -27,6 +27,11 @@ def makeAndroidManifest(templateData):
 	outputFilename="src/main/AndroidManifest.xml"
 	makeTemplateFromData(templateData, templateFilename, outputFilename)
 
+def makeTaskService(templateData):	
+	templateFilename = "templates/_project_TaskService.java"
+	outputFilename = "src/main/java/" + templateData["directory"] + "/liason/" + inflection.camelize(templateData["config"]["applicationName"]) + "TaskService.java"
+	makeTemplateFromData(templateData, templateFilename, outputFilename)
+
 def makeProvider(templateData):	
 	templateFilename = "templates/_project_Provider.java"
 	outputFilename = "src/main/java/" + templateData["directory"] + "/liason/" + inflection.camelize(templateData["config"]["applicationName"]) + "Provider.java"
@@ -89,18 +94,19 @@ def makeLiasonViewModel(templateData):
 
 def makeLiasonJoinModel(templateData):	
 	for schema in templateData["schemas"]:
-		if isViewModel(templateData["mappings"], schema):
+		if not isViewModel(templateData["mappings"], schema):
 			fields = templateData["schemas"][schema]
 			for field in fields :
-				if not isJavaType(field):
-					templateFilename = "templates/_name_JoinModel.java"
-					outputFilename = "src/main/java/" + templateData["directory"] + "/joinmodels/" + inflection.camelize(schema) + "JoinModel.java"
+				if not isJavaType(field["type"]):					
 					modelTemplateData = templateData		
 					modelTemplateData["join"] = field		
 					modelTemplateData["fields"] = fields		
 					modelTemplateData["schema"] = schema
 					modelTemplateData["className"] = inflection.camelize(schema) + inflection.camelize(field["key"]) + "JoinModel"
 					
+					templateFilename = "templates/_name_JoinModel.java"
+					outputFilename = "src/main/java/" + templateData["directory"] + "/joinmodels/" + modelTemplateData["className"] + "JoinModel.java"
+
 					makeTemplateFromData(modelTemplateData, templateFilename, outputFilename)
 
 def makeTask(templateData):		
@@ -319,6 +325,7 @@ def cleanMappings(templateData):
 deleteOutputDirectory()
 templateData = getTemplateData()
 makeAndroidManifest(templateData)
+makeTaskService(templateData)
 makeProvider(templateData)
 makeDatabaseHelper(templateData)
 makeStrings(templateData)

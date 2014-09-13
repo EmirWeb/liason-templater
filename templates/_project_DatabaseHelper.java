@@ -17,7 +17,18 @@ public class ${inflection.camelize(config['applicationName'])}DatabaseHelper ext
 
         % for model in mappings['models']:
         contentList(new ${model}Model());
+        % endfor        
+
+        % for schema in schemas:
+            % if not isViewModel(mappings, schema):            
+                % for field in schemas[schema] :
+                    % if not isJavaType(field["type"]):   
+        contentList(new ${inflection.camelize(schema) + inflection.camelize(field["key"])}JoinModel());        
+                    % endif
+                % endfor
+            % endif
         % endfor
+            
 
         % for viewmodel in mappings['viewmodels']:
         contentList(new ${viewmodel}ViewModel());
