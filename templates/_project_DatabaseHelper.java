@@ -16,7 +16,7 @@ public class ${inflection.camelize(config['applicationName'])}DatabaseHelper ext
         final List<Content> contentList = new ArrayList<Content>();
 
         % for model in mappings['models']:
-        contentList(new ${model}Model());
+        contentList.add(new ${model}Model());
         % endfor        
 
         % for schema in schemas:
@@ -31,7 +31,7 @@ public class ${inflection.camelize(config['applicationName'])}DatabaseHelper ext
             
 
         % for viewmodel in mappings['viewmodels']:
-        contentList(new ${viewmodel}ViewModel());
+        contentList.add(new ${viewmodel}ViewModel());
         % endfor
 
         return contentList;

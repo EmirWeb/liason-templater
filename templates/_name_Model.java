@@ -8,7 +8,7 @@ public class ${inflection.camelize(schema)}Model extends Model{
         final ContentValues contentValues = new ContentValues();
 
     % for field in fields:
-        contentValues.put(Columns.${inflection.underscore(field["key"]).upper()}.getName(), ${inflection.camelize(field["key"], False)}Json.get${inflection.camelize(field["key"], False)}());
+        contentValues.put(Columns.${inflection.underscore(field["key"]).upper()}.getName(), ${inflection.camelize(schema, False)}Json.get${inflection.camelize(field["key"], True)}());
     % endfor
 
         return contentValues;
@@ -23,7 +23,7 @@ public class ${inflection.camelize(schema)}Model extends Model{
     public static class Columns {
         % for field in fields:
         @ColumnDefinition
-        public static final ModelColumn ${inflection.underscore(field["key"]).upper()} = new ModelColumn(${inflection.camelize(schema)}Model.NAME, ${inflection.camelize(schema)}Json.Fields.ID, Type.${toSqlType(field["type"])});
+        public static final ModelColumn ${inflection.underscore(field["key"]).upper()} = new ModelColumn(${inflection.camelize(schema)}Model.NAME, ${inflection.camelize(schema)}Json.Fields.${inflection.underscore(field["key"]).upper()}, Column.Type.${toSqlType(field["type"])});
         % endfor
     }
 

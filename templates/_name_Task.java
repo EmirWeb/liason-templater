@@ -117,7 +117,7 @@ public class ${inflection.camelize(schema)}Task extends Task {
     /**
      * REQUIRED - TaskService expects this constuctor, feel free to add functionality to it, but do not delete it.
      */ 
-    public ProductTask(final Context context, final String authorty, final Uri uri) {
+    public ${inflection.camelize(schema)}Task(final Context context, final String authorty, final Uri uri) {
         super(context, authorty, uri);
     }
 

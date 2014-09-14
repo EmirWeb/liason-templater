@@ -14,7 +14,7 @@ public class ${inflection.camelize(schema)}Json {
     for field in fields:
         constructor.append("final " + toSafeType(field["type"]) + " " + inflection.camelize(field["key"], False))
     %>
-    public Product(${", ".join(constructor)}) {
+    public ${inflection.camelize(schema)}Json(${", ".join(constructor)}) {
     % for field in fields:
         m${inflection.camelize(field["key"])} = ${inflection.camelize(field["key"], False)};        
     % endfor
